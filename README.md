@@ -1,6 +1,11 @@
 # PBI Dataset Owners
 
-List every Power BI **dataset** and **dataflow** in your tenant along with the `configuredBy` owner, using the [Power BI Admin REST APIs](https://learn.microsoft.com/rest/api/power-bi/admin).
+Identify Power BI **datasets** and **dataflows** at risk when regular users are removed from gateway / cloud connection access.
+
+For each dataset the script calls the [Power BI Admin REST APIs](https://learn.microsoft.com/rest/api/power-bi/admin) to:
+- List every dataset and dataflow with its `configuredBy` owner.
+- Check whether the dataset uses a **gateway connection** (via Get Datasources As Admin).
+- Flag items as **at risk** where the owner is not one of the designated service accounts.
 
 ## Prerequisites
 
@@ -8,7 +13,7 @@ List every Power BI **dataset** and **dataflow** in your tenant along with the `
 |---|---|
 | Python | 3.10+ |
 | Identity | Signed-in user with **Fabric Administrator** or **Power BI Administrator** role |
-| Azure CLI | `az login` (or any credential source supported by `DefaultAzureCredential`) |
+| Azure CLI | `az login` — the script authenticates via `AzureCliCredential` |
 
 ## Setup
 
@@ -22,14 +27,27 @@ Ensure you're logged in with a user that has Power BI admin permissions:
 az login
 ```
 
+Create a `.env` file (or edit the included one) with the service accounts that will **keep** gateway connection access:
+
+```env
+PBI_SERVICE_ACCOUNTS=svc1@contoso.com,svc2@contoso.com
+```
+
 ## Usage
 
 ```bash
 python pbi_dataset_owners.py
 ```
 
-The script will:
-1. Authenticate via client-credentials (MSAL).
-2. Call **GET /admin/datasets** and **GET /admin/dataflows** (with pagination).
-3. Print a summary table to stdout.
-4. Write a CSV file (`pbi_owners.csv`) with columns: `Type, WorkspaceId, Id, Name, ConfiguredBy`.
+## Output
+
+The script produces:
+
+| File | Description |
+|---|---|
+| `pbi_owners.csv` | All datasets and dataflows in the tenant |
+| `pbi_at_risk.csv` | Only items owned by non-service-account users that use a gateway connection |
+
+Both CSVs contain the columns: `Type`, `WorkspaceId`, `Id`, `Name`, `ConfiguredBy`, `UsesGateway`, `GatewayId`, `DatasourceTypes`, `AtRisk`.
+
+A summary of impacted users and their at-risk items is also printed to the console.

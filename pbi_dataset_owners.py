@@ -139,6 +139,8 @@ def main() -> None:
             "Id": dataset_id,
             "Name": name,
             "ConfiguredBy": owner,
+            "CreatedDate": ds.get("createdDate", ""),
+            "LastRefreshTime": ds.get("lastRefreshTime", ""),
             "UsesGateway": str(on_gateway),
             "GatewayId": gateway_id,
             "DatasourceTypes": "; ".join(ds_types),
@@ -170,6 +172,8 @@ def main() -> None:
             "Id": df.get("objectId", ""),
             "Name": df.get("name", ""),
             "ConfiguredBy": owner,
+            "CreatedDate": df.get("modelCreatedDate", ""),
+            "LastRefreshTime": df.get("modifiedDateTime", ""),
             "UsesGateway": "N/A",
             "GatewayId": "",
             "DatasourceTypes": "",
@@ -182,6 +186,7 @@ def main() -> None:
     # ── Write CSVs ───────────────────────────────────────────────────────
     fieldnames = [
         "Type", "WorkspaceId", "Id", "Name", "ConfiguredBy",
+        "CreatedDate", "LastRefreshTime",
         "UsesGateway", "GatewayId", "DatasourceTypes", "AtRisk",
     ]
 

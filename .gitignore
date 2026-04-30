@@ -217,4 +217,5 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-*.csv
+pbi_owners.csv
+pbi_at_risk.csv
